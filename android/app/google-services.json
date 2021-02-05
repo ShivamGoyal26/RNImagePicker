@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "753421607565",
+    "project_id": "rnimagepicker-edf8d",
+    "storage_bucket": "rnimagepicker-edf8d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:753421607565:android:a42b405bb0927a8222b8c4",
+        "android_client_info": {
+          "package_name": "com.rnimagepicker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "753421607565-op5t80n0des8e4kqsn6jc96qq3u3n9a7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWbHB2V0UKpyQY9b9RPxjID04wAgeQqZI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "753421607565-op5t80n0des8e4kqsn6jc96qq3u3n9a7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
