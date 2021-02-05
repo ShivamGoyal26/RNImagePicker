@@ -55,6 +55,8 @@ const App = () => {
   }
 
   const uploadImage = async () => {
+    console.log("this is the image data")
+    console.log(image)
     const { uri } = image;
     const filename = uri.substring(uri.lastIndexOf('/') + 1);
     const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
@@ -97,9 +99,11 @@ const App = () => {
             <Progress.Bar progress={transferred} width={300} />
           </View>
         ) : (
+          <View style={styles.buttonCont}>
             <TouchableOpacity style={styles.uploadButton} onPress={uploadImage}>
-              <Text style={styles.buttonText}>Upload image</Text>
+              <Text style={styles.buttonText} numberOfLines={1}>Upload image</Text>
             </TouchableOpacity>
+            </View>
           )}
       </View>
     </SafeAreaView>
@@ -121,24 +125,6 @@ const styles = StyleSheet.create({
     height: Dimensions.get('screen').height - 20,
     width: Dimensions.get('screen').width
   },
-  ImageSections: {
-    display: 'flex',
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    justifyContent: 'center'
-  },
-  images: {
-    width: 150,
-    height: 150,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginHorizontal: 3
-  },
-  btnParentSection: {
-    alignItems: 'center',
-    marginTop: 10
-  },
   btnSection: {
     width: 225,
     height: 50,
@@ -153,6 +139,26 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 14,
     fontWeight: 'bold'
+  },
+  btnParentSection: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadButton:{
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 20,
+  },
+  buttonCont:{
+    alignItems: 'center',
+  },
+  buttonText:{
+    color: 'white',
+    fontSize: 18,
+  },
+  progressBarContainer:{
+    alignItems: 'center',
   }
 });
 
