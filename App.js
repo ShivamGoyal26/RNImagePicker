@@ -1,107 +1,30 @@
-import React, { Fragment, Component } from 'react';
+import React, { useState } from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 import {
-  SafeAreaView,
-  StyleSheet,
   View,
   Text,
-  StatusBar,
-  Image,
+  SafeAreaView,
+  StyleSheet,
+  Platform,
+  Alert,
   Dimensions,
   TouchableOpacity
 } from 'react-native';
 import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
-const options = {
-  title: 'Select Avatar',
-  customButtons: [{ name: 'fb', title: 'Choose Photo from Facebook' }],
-  storageOptions: {
-    skipBackup: true,
-    path: 'images',
-  },
-};
-export default class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      filepath: {
-        data: '',
-        uri: ''
-      },
-      fileData: '',
-      fileUri: ''
-    }
-  }
+import storage from '@react-native-firebase/storage';
+import * as Progress from 'react-native-progress';
 
-  chooseImage = () => {
-    let options = {
-      title: 'Select Image',
-      customButtons: [
-        { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-      ],
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
+const App = () => {
 
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
-      } else {
-        const source = { uri: response.uri };
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [transferred, setTransferred] = useState(0);
+  const [fileUri, setFileUri] = useState(null);
 
-        // You can also display the image using data:
-        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-        // alert(JSON.stringify(response));s
-        console.log('response', JSON.stringify(response));
-        this.setState({
-          filePath: response,
-          fileData: response.data,
-          fileUri: response.uri
-        });
-      }
-    });
-  }
 
-  launchCamera = () => {
-    let options = {
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.launchCamera(options, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-        alert(response.customButton);
-      } else {
-        const source = { uri: response.uri };
-        console.log('response', JSON.stringify(response));
-        this.setState({
-          filePath: response,
-          fileData: response.data,
-          fileUri: response.uri
-        });
-      }
-    });
-
-  }
-
-  launchImageLibrary = () => {
+  const launchImageLibrary = () => {
     let options = {
       storageOptions: {
         skipBackup: true,
@@ -119,83 +42,71 @@ export default class App extends Component {
         console.log('User tapped custom button: ', response.customButton);
         alert(response.customButton);
       } else {
-        // const source = { uri: response.uri };
+        const source = { uri: response.uri };
         console.log('response', JSON.stringify(response));
-        this.setState({
-          filePath: response,
-          fileData: response.data,
-          fileUri: response.uri
-        });
+        setImage(source);
+        // filePath: response,
+        // fileData: response.data,
+        setFileUri(response.uri)
+
       }
     });
 
   }
 
-  // renderFileData() {
-  //   if (this.state.fileData) {
-  //     return <Image source={{ uri: 'data:image/jpeg;base64,' + this.state.fileData }}
-  //       style={styles.images}
-  //     />
-  //   } else {
-  //     // return <Image source={require('./assets/dummy.png')}
-  //     // style={styles.images}
-  //     // />
-  //     <Text>Nothing To show</Text>
-  //   }
-  // }
-
-  renderFileUri() {
-    if (this.state.fileUri) {
-      return <Image
-        source={{ uri: this.state.fileUri }}
-        style={styles.images}
-      />
-    } else {
-      // return <Image
-      //   source={require('./assets/galeryImages.jpg')}
-      //   style={styles.images}
-      // />
-      <Text>Nothing to show here</Text>
+  const uploadImage = async () => {
+    const { uri } = image;
+    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+    setUploading(true);
+    setTransferred(0);
+    const task = storage()
+      .ref(filename)
+      .putFile(uploadUri);
+    // set progress state
+    task.on('state_changed', snapshot => {
+      setTransferred(
+        Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000
+      );
+    });
+    try {
+      await task;
+    } catch (e) {
+      console.error(e);
     }
-  }
-  render() {
-    return (
-      <Fragment>
-        <StatusBar barStyle="dark-content" />
-        <SafeAreaView>
-          <View style={styles.body}>
-            <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 10 }} >Pick Images from Camera & Gallery</Text>
-            <View style={styles.ImageSections}>
-              {/* <View>
-                {this.renderFileData()}
-                <Text style={{ textAlign: 'center' }}>Base 64 String</Text>
-              </View> */}
-              <View>
-                {this.renderFileUri()}
-                <Text style={{ textAlign: 'center' }}>File Uri</Text>
-              </View>
-            </View>
-
-            <View style={styles.btnParentSection}>
-              <TouchableOpacity onPress={this.chooseImage} style={styles.btnSection}  >
-                <Text style={styles.btnText}>Choose File</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={this.launchCamera} style={styles.btnSection}  >
-                <Text style={styles.btnText}>Directly Launch Camera</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={this.launchImageLibrary} style={styles.btnSection}  >
-                <Text style={styles.btnText}>Directly Launch Image Library</Text>
-              </TouchableOpacity>
-            </View>
-
-          </View>
-        </SafeAreaView>
-      </Fragment>
+    setUploading(false);
+    Alert.alert(
+      'Photo uploaded!',
+      'Your photo has been uploaded to Firebase Cloud Storage!'
     );
-  }
-};
+    setImage(null);
+  };
+
+  return (
+    <SafeAreaView>
+      <View style={styles.body}>
+        <Text style={{ textAlign: 'center', fontSize: 20, paddingBottom: 10 }} >Pick Images from Camera & Gallery</Text>
+
+        <View style={styles.btnParentSection}>
+          <TouchableOpacity onPress={launchImageLibrary} style={styles.btnSection}  >
+            <Text style={styles.btnText}>Directly Launch Image Library</Text>
+          </TouchableOpacity>
+        </View>
+        {uploading ? (
+          <View style={styles.progressBarContainer}>
+            <Progress.Bar progress={transferred} width={300} />
+          </View>
+        ) : (
+            <TouchableOpacity style={styles.uploadButton} onPress={uploadImage}>
+              <Text style={styles.buttonText}>Upload image</Text>
+            </TouchableOpacity>
+          )}
+      </View>
+    </SafeAreaView>
+  );
+}
+
+
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -244,3 +155,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   }
 });
+
+export default App;

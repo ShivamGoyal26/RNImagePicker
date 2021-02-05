@@ -14,7 +14,8 @@
     "@react-native-firebase/storage": "^10.6.3",
     "react": "16.13.1",
     "react-native": "0.63.4",
-    "react-native-image-picker": "^3.1.4"
+    "react-native-image-picker": "^3.1.4",
+    "react-native-progress": "^4.1.2"
   },
   "devDependencies": {
     "@babel/core": "7.12.13",
