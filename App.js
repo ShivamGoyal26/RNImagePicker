@@ -43,10 +43,7 @@ const App = () => {
         alert(response.customButton);
       } else {
         const source = { uri: response.uri };
-        console.log('response', JSON.stringify(response));
         setImage(source);
-        // filePath: response,
-        // fileData: response.data,
         setFileUri(response.uri)
 
       }
@@ -55,17 +52,14 @@ const App = () => {
   }
 
   const uploadImage = async () => {
-    console.log("this is the image data")
-    console.log(image)
     const { uri } = image;
-    const filename = uri.substring(uri.lastIndexOf('/') + 1);
+    const filename = uri.substring(uri.lastIndexOf('/') + 1)
     const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
     setUploading(true);
     setTransferred(0);
     const task = storage()
       .ref(filename)
       .putFile(uploadUri);
-    // set progress state
     task.on('state_changed', snapshot => {
       setTransferred(
         Math.round(snapshot.bytesTransferred / snapshot.totalBytes) * 10000
